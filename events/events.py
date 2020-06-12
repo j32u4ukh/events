@@ -1,16 +1,14 @@
-# -*- coding: utf-8 -*-
-
 """
-    Events
-    ~~~~~~
+Events
+~~~~~~
 
-    Implements C#-Style Events.
+Implements C#-Style Events.
 
-    Derived from the original work by Zoran Isailovski:
-    http://code.activestate.com/recipes/410686/ - Copyright (c) 2005
+Derived from the original work by Zoran Isailovski:
+http://code.activestate.com/recipes/410686/ - Copyright (c) 2005
 
-    :copyright: (c) 2014-2017 by Nicola Iarocci.
-    :license: BSD, see LICENSE for more details.
+:copyright: (c) 2014-2017 by Nicola Iarocci.
+:license: BSD, see LICENSE for more details.
 """
 
 
@@ -61,7 +59,7 @@ class Events:
             if name not in self.__class__.__events__:
                 raise EventsException("Event '%s' is not declared" % name)
 
-        self.__dict__[name] = ev = _EventSlot(name)
+        self.__dict__[name] = ev = EventSlot(name)
         return ev
 
     def __repr__(self):
@@ -77,12 +75,12 @@ class Events:
     def __iter__(self):
         def gen(dictitems=self.__dict__.items()):
             for attr, val in dictitems:
-                if isinstance(val, _EventSlot):
+                if isinstance(val, EventSlot):
                     yield val
         return gen()
 
 
-class _EventSlot:
+class EventSlot:
     def __init__(self, name):
         self.targets = []
         self.__name__ = name
@@ -91,21 +89,29 @@ class _EventSlot:
         return "event '%s'" % self.__name__
 
     def __call__(self, *a, **kw):
+        """ Events 的 on_change() 呼叫時，會被呼叫的函式，可輸入參數 *a, **kw"""
         for f in tuple(self.targets):
             f(*a, **kw)
 
     def __iadd__(self, f):
+        """ Override += 符號
+        使用 += 相當於呼叫 __iadd__ """
         self.targets.append(f)
         return self
 
     def __isub__(self, f):
+        """ Override -= 符號
+        使用 -= 相當於呼叫 __isub__ """
+        # 使用 while 而非 if 的原因為: 同樣的元素或函式可以重複加入，不一定只有一個
         while f in self.targets:
             self.targets.remove(f)
         return self
 
     def __len__(self):
+        # 取得長度
         return len(self.targets)
 
+    # region 代迭 EventSlot 時的 Iterable 物件
     def __iter__(self):
         def gen():
             for target in self.targets:
@@ -114,3 +120,21 @@ class _EventSlot:
 
     def __getitem__(self, key):
         return self.targets[key]
+    # endregion
+
+
+if __name__ == "__main__":
+    def onChangedListener():
+        print("onChangedListener")
+
+    def onChangedValueListener(value):
+        print(f"onChangedValueListener value: {value}")
+
+    event = Events()
+    # event.on_change += onChangedListener
+    event.on_change += onChangedValueListener
+    event.on_change += onChangedValueListener
+
+    for i in range(50):
+        if i % 7 == 0:
+            event.on_change(i)

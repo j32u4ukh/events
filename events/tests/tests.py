@@ -48,7 +48,7 @@ class TestEvents(TestBase):
         i = 0
         for event in self.events:
             i += 1
-            self.assertTrue(isinstance(event, events.events._EventSlot))
+            self.assertTrue(isinstance(event, events.events.EventSlot))
         self.assertEqual(i, 2)
 
 
@@ -62,7 +62,7 @@ class TestEventSlot(TestBase):
 
     def test_type(self):
         ev = self.events.on_change
-        self.assertTrue(isinstance(ev, events.events._EventSlot))
+        self.assertTrue(isinstance(ev, events.events.EventSlot))
         self.assertEqual(ev.__name__, 'on_change')
 
     def test_len(self):
