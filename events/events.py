@@ -12,10 +12,6 @@ http://code.activestate.com/recipes/410686/ - Copyright (c) 2005
 """
 
 
-class EventsException(Exception):
-    pass
-
-
 class Events:
     """
     Encapsulates the core to event subscription and event firing, and feels
@@ -36,17 +32,17 @@ class Events:
     def __init__(self, events=None):
 
         if events is not None:
-
+            # 檢查 events 是否為 iterable
             try:
                 for _ in events:
                     break
             except:
-                raise AttributeError("type object %s is not iterable" %
-                                     (type(events)))
+                raise AttributeError("type object %s is not iterable" % (type(events)))
             else:
                 self.__events__ = events
 
     def __getattr__(self, name):
+        print("__getattr__, name: ", name)
         if name.startswith('__'):
             raise AttributeError("type object '%s' has no attribute '%s'" %
                                  (self.__class__.__name__, name))
@@ -59,6 +55,7 @@ class Events:
             if name not in self.__class__.__events__:
                 raise EventsException("Event '%s' is not declared" % name)
 
+        print("Add new attr ", name)
         self.__dict__[name] = ev = EventSlot(name)
         return ev
 
@@ -123,18 +120,23 @@ class EventSlot:
     # endregion
 
 
+class EventsException(Exception):
+    def __init__(self, msg):
+        print(f"[EventsException] {msg}")
+
+
 if __name__ == "__main__":
-    def onChangedListener():
-        print("onChangedListener")
+    def onClickedListener():
+        print("onClickedListener")
 
     def onChangedValueListener(value):
         print(f"onChangedValueListener value: {value}")
 
     event = Events()
-    # event.on_change += onChangedListener
-    event.on_change += onChangedValueListener
+    event.on_click += onClickedListener
     event.on_change += onChangedValueListener
 
     for i in range(50):
         if i % 7 == 0:
+            event.on_click()
             event.on_change(i)
