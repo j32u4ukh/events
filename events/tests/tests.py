@@ -2,12 +2,12 @@
 
 import unittest
 import events
-from events import Events, EventsException
+from events import Event, EventsException
 
 
 class TestBase(unittest.TestCase):
     def setUp(self):
-        self.events = Events()
+        self.events = Event()
 
     def callback1(self):
         pass
@@ -21,7 +21,7 @@ class TestBase(unittest.TestCase):
 
 class TestEvents(TestBase):
     def test_getattr(self):
-        class MyEvents(Events):
+        class MyEvents(Event):
             __events__ = ('on_eventOne', )
 
         try:
@@ -48,7 +48,7 @@ class TestEvents(TestBase):
         i = 0
         for event in self.events:
             i += 1
-            self.assertTrue(isinstance(event, events.events.EventSlot))
+            self.assertTrue(isinstance(event, events.EventSlot))
         self.assertEqual(i, 2)
 
 
@@ -62,7 +62,7 @@ class TestEventSlot(TestBase):
 
     def test_type(self):
         ev = self.events.on_change
-        self.assertTrue(isinstance(ev, events.events.EventSlot))
+        self.assertTrue(isinstance(ev, events.EventSlot))
         self.assertEqual(ev.__name__, 'on_change')
 
     def test_len(self):
@@ -104,7 +104,7 @@ class TestInstanceEvents(TestBase):
 
     def test_getattr(self):
 
-        MyEvents = Events(('on_eventOne', ))
+        MyEvents = Event(('on_eventOne', ))
 
         try:
             MyEvents.on_eventOne += self.callback1
@@ -125,7 +125,7 @@ class TestInstanceEvents(TestBase):
 
     def test_instance_restriction(self):
 
-        class MyEvents(Events):
+        class MyEvents(Event):
             __events__ = ('on_eventOne', 'on_eventTwo')
 
         MyRestrictedInstance = MyEvents(('on_everyTwo', ))
