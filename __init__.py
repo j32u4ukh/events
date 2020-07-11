@@ -12,7 +12,6 @@ http://code.activestate.com/recipes/410686/ - Copyright (c) 2005
 """
 
 
-# TODO: 嘗試做出一個事件的全部監聽器都執行完，才執行下一個的效果(如果是第一個監聽器觸發下一個事件的情況時)
 class Event:
     """
     一個 Events 可以添加多個 EventSlot，而一個 EventSlot 又可添加多個 Listener
@@ -150,6 +149,12 @@ class EventSlot:
 class EventsException(Exception):
     def __init__(self, msg):
         print(f"EventsException | {msg}")
+
+
+# TODO: 嘗試做出一個事件的全部監聽器都執行完，才執行下一個的效果(如果是第一個監聽器觸發下一個事件的情況時)
+class SequentialEvent:
+    def __init__(self):
+        pass
 
 
 if __name__ == "__main__":
