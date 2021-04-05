@@ -72,6 +72,13 @@ class Event:
 
         return gen()
 
+    def clearEventSlot(self):
+        self.__dict__ = dict()
+
+    def clearListener(self, slot):
+        event_slot = self.__dict__[slot]
+        event_slot.clearListener()
+
 
 class EventSlot:
     def __init__(self, name):
@@ -145,6 +152,9 @@ class EventSlot:
         """ 呼叫 len(self) 時會返回的數值 """
         return len(self.func_container)
 
+    def clearListener(self):
+        self.func_container = []
+
 
 class EventsException(Exception):
     def __init__(self, msg):
@@ -171,9 +181,15 @@ if __name__ == "__main__":
     event.on_change += onChangedValueListener
     event.on_change += onChangedValueListener
 
-    for i in range(50):
-        if i % 7 == 0:
-            event.on_click()
-            event.on_change(i)
+    event.clearListener(slot="on_change")
+    event.on_change += onChangedValueListener
 
+    event.on_click()
+    event.on_change(7)
+    event.clearEventSlot()
+
+    print(event)
+
+    event.on_click()
+    event.on_change(7)
     print(event)
